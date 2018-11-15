@@ -181,8 +181,19 @@ class ParsleyTypeExtension extends AbstractTypeExtension
         /** @var PropertyMetadata[] $properties */
         $properties = $metadata->getPropertyMetadata($form->getName());
 
+        $group = $metadata->getDefaultGroup();
+        if(is_array($config->getOption('validation_groups')) && count($config->getOption('validation_groups')) > 0) {
+            $group = $config->getOption('validation_groups');
+        }
+
         foreach ($properties as $property) {
-            $constraints = array_merge($constraints, $property->findConstraints($metadata->getDefaultGroup()));
+            if(is_array($group)) {
+                foreach ($group as $item) {
+                    $constraints = array_merge($constraints, $property->findConstraints($item));
+                }
+            } else {
+                $constraints = array_merge($constraints, $property->findConstraints($group));
+            }
         }
 
         return $constraints;
